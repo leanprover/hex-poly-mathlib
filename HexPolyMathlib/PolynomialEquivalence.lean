@@ -19,7 +19,7 @@ public import HexPoly
 public section
 
 /-!
-Identification definitions between the executable `Hex.DensePoly`
+Equivalence between the executable `Hex.DensePoly`
 representation and Mathlib's `Polynomial`.
 
 This module provides the concrete conversion functions and ring equivalence
@@ -54,7 +54,7 @@ def toPolynomial [Semiring R] [DecidableEq R] (p : Hex.DensePoly R) : Polynomial
 /-- Rebuild a normalized dense polynomial from the coefficients of a Mathlib polynomial. -/
 @[expose]
 def ofPolynomial [Semiring R] [DecidableEq R] (p : Polynomial R) : Hex.DensePoly R :=
-  Hex.DensePoly.ofCoeffs <| ((List.range (p.natDegree + 1)).map p.coeff).toArray
+  Hex.DensePoly.ofList ((List.range (p.natDegree + 1)).map p.coeff)
 
 /-- Rebuilding via {name}`ofPolynomial` preserves coefficients: the `n`th coefficient
 of `ofPolynomial p` agrees with the `n`th coefficient of `p`. -/
@@ -62,7 +62,7 @@ of `ofPolynomial p` agrees with the `n`th coefficient of `p`. -/
 theorem coeff_ofPolynomial [Semiring R] [DecidableEq R] (p : Polynomial R) (n : Nat) :
     (ofPolynomial p).coeff n = p.coeff n := by
   unfold ofPolynomial
-  rw [Hex.DensePoly.coeff_ofCoeffs_list, list_getD_map_range_zero]
+  rw [Hex.DensePoly.coeff_ofList, list_getD_map_range_zero]
   by_cases hn : n < p.natDegree + 1
   · simp [hn]
   · have hlt : p.natDegree < n := by omega
@@ -79,7 +79,7 @@ private def denseDiagonalMulCoeffTerm [Zero R] [DecidableEq R] [Mul R]
 
 /-- The bounded version of {name}`denseDiagonalMulCoeffTerm` seen by an inner
 `List.range m` fold. It keeps only diagonal terms whose second index is within
-the current bound, forming the bridge from `mulCoeffStep` to the unbounded
+the current bound, forming the correspondence from `mulCoeffStep` to the unbounded
 diagonal term. -/
 private def denseBoundedDiagonalMulCoeffTerm [Zero R] [DecidableEq R] [Mul R]
     (p q : Hex.DensePoly R) (n i m : Nat) : R :=
@@ -237,7 +237,7 @@ private theorem diagonalSum_eq_degree_bound [Semiring R] [DecidableEq R]
     exact fold_diagonal_truncate_degree p q n (p.size - (n + 1))
 
 /-- A left fold that repeatedly adds `f i` over `List.range m` is the same as
-the corresponding `Finset.range` sum. This is the final fold-to-sum bridge used
+the corresponding `Finset.range` sum. This is the final fold-to-sum correspondence used
 before comparing executable multiplication with Mathlib polynomial multiplication. -/
 private theorem range_foldl_add_eq_finset_sum [AddCommMonoid R] (f : Nat → R) (m : Nat) :
     (List.range m).foldl (fun acc i => acc + f i) 0 = ∑ i ∈ Finset.range m, f i := by
@@ -267,7 +267,7 @@ theorem coeff_toPolynomial [Semiring R] [DecidableEq R] (p : Hex.DensePoly R) (n
       have hne : i ≠ n := by omega
       simp [Polynomial.coeff_monomial, hne]
 
-/-- Coefficient-sum evaluation bridge: evaluating `toPolynomial p` through a ring
+/-- Coefficient-sum evaluation correspondence: evaluating `toPolynomial p` through a ring
 hom `f` at `x` is the degree-indexed sum `∑ f (p.coeff i) * x ^ i`. For a literal
 `ofCoeffs` array this unfolds via {name}`Finset.sum_range_succ` into an explicit
 polynomial in `x`, which `ring`/`norm_num` can then discharge. -/
