@@ -9,7 +9,7 @@ leanOptions = [
 [[require]]
 name = "HexPoly"
 git = "https://github.com/leanprover/hex-poly.git"
-rev = "104a2b0c00eedf0ecab222c1a977dd53dbaa9bb3"
+rev = "1ca97f372946ecc430fe4f3961ec4220f9bc7706"
 
 [[require]]
 name = "mathlib"
